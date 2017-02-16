@@ -1,3 +1,16 @@
+void HashTable::sort(Node* mapped, Node* temp)		//Good To Go
+{
+    if (temp->getKey() <= mapped->next->getKey())
+    {
+        temp->next = mapped->next;
+        mapped->next = temp;
+    }
+    else
+    {
+        sort(mapped->next, temp);
+    }
+}
+
 void HashTable::insert(int key)		//Good To Go
 {
     int index = hash(key);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <array>
 
 using namespace std;
 
@@ -88,30 +89,24 @@ class Node								//Good To Go
 {
 	public:
 		Node(int key);
-		~Node();
+		~Node() { delete next; };
 		Node* next;
+		int* getFactors() { return factors; };
+		int getKey() { return key; };
+		int getSize() { return size; };
 		void factor();
-		int getKey();
 	private:
 		int key;
 		int* factors;
+		int size;
 };
 
 Node::Node(int key)					//Good To Go
 {
 	this->key = key;
 	next = NULL;
+	size = 0;
 	factor();
-}
-
-Node::~Node()							//Good To Go
-{
-	delete next;
-}
-
-int Node::getKey()
-{
-	return key;
 }
 
 void Node::factor()
@@ -130,6 +125,7 @@ void Node::factor()
 			factors[ii+1] = key/factors[ii];
 		}
 	}
+	size = N;
 }
 
 class HashTable							//Good To Go
@@ -139,9 +135,8 @@ class HashTable							//Good To Go
 		~HashTable();
 		Node* find(int key);
 		int hash(int key);
-		void sort(Node* mapped, Node* temp);
 		void insert(int key);
-		bool checkFactors(int key, int* inputs);
+		bool checkFactors(int key, int* inputs, int C);
 	private:
 		Node** map;  //take in each input and hash it into the correct bucket
 		int b;
@@ -178,30 +173,58 @@ void HashTable::insert(int key)		//Good To Go
 	}
 }
 
-void HashTable::sort(Node* mapped, Node* temp)		//Good To Go
+Node* HashTable::find(int key)			//
 {
-	if (temp->getKey() <= mapped->next->getKey())
+	Node* temp = map[hash(key)];
+	do //check key of map[index]
 	{
-		temp->next = mapped->next;
-		mapped->next = temp;
-	}
-	else
-	{
-		sort(mapped->next, temp);
-	}
-}
-
-
-Node* HashTable::find(int key)			//Empty
-{
-	int index = hash(key);
-	
+		if (temp->getKey() == key)
+		{
+			return temp;
+		}
+		else
+		{
+			temp = temp->next;
+		}
+	} while (temp != NULL);
 	return NULL;
 }
 
-bool HashTable::checkFactors(int key, int* inputs)
+bool HashTable::checkFactors(int key, int* inputs, int C)
 {
-	
+	Node* temp = find(key);
+	int* factors = temp->getFactors();
+	for (int ii = 0; ii < temp->getSize(); ii++) //cycles through factor pairs
+	{
+		int a = factors[2*ii], b = factors[2*ii+1];
+		bool A = false, B = false;
+		for (int jj = 1; jj <= C; jj++) //cycles through factor pairs   // check very carefully*****
+		{
+			if (a != b)
+			{
+				if (inputs[C-jj] == a)
+				{
+					A = true;
+				}
+				if(inputs[C-jj] == b)
+				{
+					B = true;
+				}
+			}
+			else
+			{
+				if (inputs[C-jj] == a && !A)
+				{
+					A = true;
+				}
+				if(inputs[C-jj] == a && A)
+				{
+					B = true;
+				}
+			}
+			if (A && B) return 1;
+		}
+	}
 	return 0;
 }
 
@@ -229,7 +252,7 @@ int main()								//Needs Work and to check input
 	mergeSort(keys, N); //sort keys in descending order
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		if (factors.checkFactors(keys[ii], keys))  //checkFactors(int keyToCheck, int setOfKeys[])
+		if (factors.checkFactors(keys[ii], keys, N-ii))
 		{
 			return keys[ii];  //return the first key to pass test or return -1
 		}
