@@ -89,19 +89,42 @@ class Node								//Good To Go
 	public:
 		Node(int value);
 		~Node();
-		int value;
 		Node* next;
+		void factor();
+		int getKey();
+	private:
+		int key;
+		int* factors;
 };
 
 Node::Node(int value)					//Good To Go
 {
-	this->value = value;
+	key = value;
 	next = NULL;
+	factor();
 }
 
 Node::~Node()							//Good To Go
 {
 	delete next;
+}
+
+void Node::factor()
+{
+	int N = 0
+	for (int ii = 2; ii < key/2; ii++)
+	{
+		if (key%ii==0) N++;
+	}
+	factors = new int[2*N];
+	for (int ii = 2; ii < key/2; ii++)
+	{
+		if (key%ii==0) 
+		{
+			factors[ii] = key/ii;
+			factors[ii+1] = key/ii;
+		}
+	}
 }
 
 class HashTable							//Good To Go
