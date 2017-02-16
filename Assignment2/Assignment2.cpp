@@ -136,7 +136,7 @@ class HashTable							//Good To Go
 		Node* find(int key);
 		int hash(int key);
 		void insert(int key);
-		bool checkFactors(int key, int* inputs, int C);
+		bool checkFactors(int key, int* inputs, int K, int N);
 	private:
 		Node** map;  //take in each input and hash it into the correct bucket
 		int b;
@@ -190,7 +190,7 @@ Node* HashTable::find(int key)			//
 	return NULL;
 }
 
-bool HashTable::checkFactors(int key, int* inputs, int C)
+bool HashTable::checkFactors(int key, int* inputs, int K, int N)
 {
 	Node* temp = find(key);
 	int* factors = temp->getFactors();
@@ -198,26 +198,26 @@ bool HashTable::checkFactors(int key, int* inputs, int C)
 	{
 		int a = factors[2*ii], b = factors[2*ii+1];
 		bool A = false, B = false;
-		for (int jj = 1; jj <= C; jj++) //cycles through factor pairs   // check very carefully*****
+		for (int jj = K; jj < N; jj++) //cycles through factor pairs   // check very carefully*****
 		{
 			if (a != b)
 			{
-				if (inputs[C-jj] == a)
+				if (inputs[jj] == a)
 				{
 					A = true;
 				}
-				if(inputs[C-jj] == b)
+				if(inputs[jj] == b)
 				{
 					B = true;
 				}
 			}
 			else
 			{
-				if (inputs[C-jj] == a && !A)
+				if (inputs[jj] == a && !A)
 				{
 					A = true;
 				}
-				if(inputs[C-jj] == a && A)
+				if(inputs[jj] == a && A)
 				{
 					B = true;
 				}
@@ -252,9 +252,10 @@ int main()								//Needs Work and to check input
 	mergeSort(keys, N); //sort keys in descending order
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		if (factors.checkFactors(keys[ii], keys, N-ii))
+		if (factors.checkFactors(keys[ii], keys, ii, N))
 		{
-			return keys[ii];  //return the first key to pass test or return -1
+			cout << keys[ii] << endl;  //return the first key to pass test
+			return 0;
 		}
 	}
 	return -1;
