@@ -87,7 +87,7 @@ void mergeSort(int* keys, int N)
 class Node								//Good To Go
 {
 	public:
-		Node(int value);
+		Node(int key);
 		~Node();
 		Node* next;
 		void factor();
@@ -97,9 +97,9 @@ class Node								//Good To Go
 		int* factors;
 };
 
-Node::Node(int value)					//Good To Go
+Node::Node(int key)					//Good To Go
 {
-	key = value;
+	this->key = key;
 	next = NULL;
 	factor();
 }
@@ -109,9 +109,14 @@ Node::~Node()							//Good To Go
 	delete next;
 }
 
+int Node::getKey()
+{
+	return key;
+}
+
 void Node::factor()
 {
-	int N = 0
+	int N = 0;
 	for (int ii = 2; ii < key/2; ii++)
 	{
 		if (key%ii==0) N++;
@@ -122,7 +127,7 @@ void Node::factor()
 		if (key%ii==0) 
 		{
 			factors[ii] = key/ii;
-			factors[ii+1] = key/ii;
+			factors[ii+1] = key/factors[ii];
 		}
 	}
 }
@@ -132,10 +137,11 @@ class HashTable							//Good To Go
 	public:
 		HashTable(int N);
 		~HashTable();
+		Node* find(int key);
+		int hash(int key);
 		void sort(Node* mapped, Node* temp);
-		int hash(int value);
-		void insert(int value);
-		bool find(Node* mapped);
+		void insert(int key);
+		bool checkFactors(int key, int* inputs);
 	private:
 		Node** map;  //take in each input and hash it into the correct bucket
 		int b;
@@ -151,44 +157,30 @@ HashTable::HashTable(int N)				//Good To Go
 	}
 }
 
-int HashTable::hash(int value)			//Good To Go
+int HashTable::hash(int key)			//Good To Go
 {
-	return value % b;
+	return key % b;
 }
 
-void HashTable::insert(int value)		//Good To Go
+void HashTable::insert(int key)		//Good To Go
 {
-	int key = hash(value);
-	if (map[key] == NULL)
+	int index = hash(key);
+	if (map[index] == NULL)
 	{
-		map[key] = new Node(value);
+		map[index] = new Node(key);
 	}
 	else //first hashed int has a NULL next and is pointed to by a chain of everything after it
 	{
-		Node* temp = new Node(value);
-		if (temp->value <= map[key]->value)
-		{
-			temp->next = map[key];
-			map[key] = temp;
-		}
-		else
-		{
-			if (map[key]->next == NULL)
-			{
-				map[key]->next = temp;
-			}
-			else
-			{
-				sort(map[key], temp);
-			}
-		}
+		Node* temp = new Node(key);
+		temp->next = map[index];
+		map[index] = temp;
 		delete temp;
 	}
 }
 
 void HashTable::sort(Node* mapped, Node* temp)		//Good To Go
 {
-	if (temp->value <= mapped->next->value)
+	if (temp->getKey() <= mapped->next->getKey())
 	{
 		temp->next = mapped->next;
 		mapped->next = temp;
@@ -200,9 +192,16 @@ void HashTable::sort(Node* mapped, Node* temp)		//Good To Go
 }
 
 
-bool HashTable::find(Node* mapped)			//Empty
+Node* HashTable::find(int key)			//Empty
 {
-	//if (hash(mapped->value))
+	int index = hash(key);
+	
+	return NULL;
+}
+
+bool HashTable::checkFactors(int key, int* inputs)
+{
+	
 	return 0;
 }
 
@@ -228,13 +227,13 @@ int main()								//Needs Work and to check input
 		keys[ii] = k;
 	}
 	mergeSort(keys, N); //sort keys in descending order
-	//retreive hashed factor pairs and try them against the lesser inputs than their product
-	//return the first key to pass test or return -1
-	//check for a,b,c and return c or -1
-	for (int ii = 0; ii < N; ii++)
+	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		
+		if (factors.checkFactors(keys[ii], keys))  //checkFactors(int keyToCheck, int setOfKeys[])
+		{
+			return keys[ii];  //return the first key to pass test or return -1
+		}
 	}
-	return 0;
+	return -1;
 }
 

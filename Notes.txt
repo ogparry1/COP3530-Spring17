@@ -1,0 +1,29 @@
+void HashTable::insert(int key)		//Good To Go
+{
+    int index = hash(key);
+    if (map[index] == NULL)
+    {
+        map[index] = new Node(key);
+    }
+    else //first hashed int has a NULL next and is pointed to by a chain of everything after it
+    {
+        Node* temp = new Node(key);
+        if (temp->getKey() <= map[index]->getKey())
+        {
+            temp->next = map[index];
+            map[index] = temp;
+        }
+        else
+        {
+            if (map[index]->next == NULL)
+            {
+                map[index]->next = temp;
+            }
+            else
+            {
+                sort(map[index], temp);
+            }
+        }
+        delete temp;
+    }
+}
