@@ -84,10 +84,6 @@ void mergeSort(int* keys, int N)
 			}
 		}
 	}
-	for (int ii = 0; ii < N; ii++) //fill in halves
-	{
-		cout << "(" << keys[ii] << ", " << ii << ") ";
-	}
 }
 
 class Node								//Good To Go
@@ -108,15 +104,10 @@ class Node								//Good To Go
 
 Node::Node(int key)					//Good To Go
 {
-	cout << "Node Created => ";
 	this->key = key;
-	cout << "Key Set => ";
 	next = NULL;
-	cout << "Next Set => ";
 	N = 0;
-	cout << "Size Set => ";
 	factor();
-	cout << "Key Factored => ";
 }
 
 void Node::factor()
@@ -125,7 +116,6 @@ void Node::factor()
 	{
 		if (key%ii==0) N++;
 	}
-	cout << "\nsqrt(key) equals " << (int)sqrt((double)key) << endl;
 	factors = new int[2*N];
 	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
 	{
@@ -133,7 +123,6 @@ void Node::factor()
 		{
 			factors[ii] = key/ii;
 			factors[ii+1] = key/factors[ii];
-			cout << "(" << factors[ii] << ", " << factors[ii + 1] << ")" << endl;
 		}
 	}
 }
@@ -161,24 +150,19 @@ HashTable::HashTable(int N)				//Good To Go
 	{
 		map[ii] = NULL;
 	}
-	cout << "Hash Table Created" << endl;
 }
 
 void HashTable::printTable()
 {
 	Node* current;
-	cout << "{";
 	for (int ii = 0; ii < N; ii++)
 	{
 		current = map[ii];
 		while (current != NULL)
 		{
-			cout << current->getKey() << (current->next == NULL?"":", ");
 			current = current->next;
 		}
-		cout << (ii == N-1?"}":"; ");
 	}
-	cout << endl;
 }
 
 int HashTable::hash(int key)			//Good To Go
@@ -201,8 +185,6 @@ void HashTable::insert(int key)		//Good To Go
 		map[index] = temp;
 		delete temp;
 	}
-	cout << "Key Inserted" << endl;
-	printTable();
 }
 
 Node* HashTable::find(int key)
@@ -212,7 +194,6 @@ Node* HashTable::find(int key)
 	{
 		if (temp->getKey() == key)
 		{
-			cout << "Key Found" << endl;
 			return temp;
 		}
 		else
@@ -258,7 +239,6 @@ bool HashTable::checkFactors(int key, int* inputs, int K)
 			if (A && B) return 1;
 		}
 	}
-	cout << "No Solution" << endl;
 	return 0;
 }
 
@@ -268,37 +248,30 @@ HashTable::~HashTable()					//Good To Go*
 	{
 		delete map[ii];
 	}
-	cout << "Hash Table Deleted" << endl;
 }
 
 int main()								//Needs Work and to check input
 {
 	int N = 0, k = 0;
-	cout << "Insert N>>  ";
 	cin >> N;  // make hash map 2*k in size
 	HashTable factors(N);
 	int keys[N];
 	for (int ii = 0; ii < N; ii++)
 	{
-		cout << "Insert key>>  ";
 		cin >> k;
-		cout << "Inserting Key => ";
 		factors.insert(k); //factor a number into its product pairs and insert them in hash table
 		keys[ii] = k;
 	}
-	cout << "Sorting Keys" << endl;
 	mergeSort(keys, N); //sort keys in descending order
-	cout << "looking for max(c=a*b)" << endl;
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		if (factors.checkFactors(keys[ii], keys, ii))
+		if (factors.checkFactors(keys[ii], keys, ii+1))
 		{
-			cout << "Max Found" << endl;
 			cout << keys[ii] << endl;  //return the first key to pass test
 			return 0;
 		}
 	}
-	cout << "Max Not Found" << endl;
-	return -1;
+	cout << -1 << endl;
+	return 0;
 }
 
