@@ -252,22 +252,39 @@ HashTable::~HashTable()					//Good To Go*
 
 int main()								//Needs Work and to check input
 {
-	int N = 0, k = 0;
-	cin >> N;  // make hash map 2*k in size
+	
+	int N = 0, input = 0;
+	cin >> N;  // make hash map 2*input in size
 	HashTable factors(N);
 	int keys[N];
-	for (int ii = 0; ii < N; ii++)
+	// sort and insert //
+	for (int ii=0; ii<N; ii++) //cycle through to take in all inputs
 	{
-		cin >> k;
-		factors.insert(k); //factor a number into its product pairs and insert them in hash table
-		keys[ii] = k;
+		cin >> input; //take input
+		factors.insert(input); //factor a number into its product pairs and insert them in hash table
+		if (ii == 0)
+		{
+			keys[ii] = input;
+		}
+		else
+		{
+			int i = ii;
+			//insert sort//
+			while (input > keys[i-1] && i > 0)
+			{
+				keys[i] = keys[i-1];
+				i--;
+			}
+			keys[i] = input;
+			//insert sort//
+		}
 	}
-	mergeSort(keys, N); //sort keys in descending order
+	// sort and insert //	
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
 		if (factors.checkFactors(keys[ii], keys, ii+1))
 		{
-			cout << keys[ii] << endl;  //return the first key to pass test
+			cout << keys[ii] << endl;  //return the first inputey to pass test
 			return 0;
 		}
 	}
