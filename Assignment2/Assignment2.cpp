@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <array>
+#include <cmath>
 
 using namespace std;
 
@@ -83,7 +84,10 @@ void mergeSort(int* keys, int N)
 			}
 		}
 	}
-	cout << "keys sorted" << endl;
+	for (int ii = 0; ii < N; ii++) //fill in halves
+	{
+		cout << "(" << keys[ii] << ", " << ii << ") ";
+	}
 }
 
 class Node								//Good To Go
@@ -117,21 +121,19 @@ Node::Node(int key)					//Good To Go
 
 void Node::factor()
 {
-	for (int ii = 2; ii < key/2; ii++)
+	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
 	{
 		if (key%ii==0) N++;
 	}
-	cout << endl << key << " has " << N << " factor pairs" << endl;
+	cout << "\nsqrt(key) equals " << (int)sqrt((double)key) << endl;
 	factors = new int[2*N];
-	cout << "2*N memory allocated for the pairs" << endl;
-	int counter = 1;
-	for (int ii = 2; ii < key/2; ii++)
+	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
 	{
 		if (key%ii==0) 
 		{
 			factors[ii] = key/ii;
 			factors[ii+1] = key/factors[ii];
-			cout << "pair number " << counter++ << "is stored" << endl;
+			cout << "(" << factors[ii] << ", " << factors[ii + 1] << ")" << endl;
 		}
 	}
 }
