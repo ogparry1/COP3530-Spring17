@@ -5,6 +5,7 @@
 
 using namespace std;
 
+/*
 int max(int k, int l)
 {
 	return ((k > l)?k:l);
@@ -84,7 +85,7 @@ void insertSort(int* keys, int N)
 			}
 		}
 	}
-}
+}*/
 
 int main()								//Needs Work and to check input
 {
