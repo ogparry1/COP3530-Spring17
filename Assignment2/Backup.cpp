@@ -5,90 +5,6 @@
 
 using namespace std;
 
-int max(int k, int l)
-{
-	return ((k > l)?k:l);
-}
-
-int min(int k, int l)
-{
-	return ((k < l)?k:l);
-}
-
-void mergeSort(int* keys, int N)
-{
-	if (N == 2)
-	{
-		int temp = min(keys[0], keys[1]);
-		keys[0] = max(keys[0], keys[1]);
-		keys[1] = temp;
-	}
-	else if (N == 3)
-	{
-		int a = keys[0], b = keys[1], c = keys[2];
-		keys[0] = max(max(a,b),c);
-		keys[2] = min(min(a,b),c);
-		keys[1] = (a > keys[2] && a < keys[0]?a:(b > keys[2] && b < keys[0]?b:c));
-	}
-	else
-	{
-		int i = 0, j = 0;
-		int lastOdd = 0;
-		int* fHalf = new int[N/2]; 
-		int* sHalf = new int[N/2];
-		if (N % 2 != 0) lastOdd = keys[N-1]; //if N is odd, point to last element and insert it last
-		for (int ii = 0; ii < N/2; ii++) //fill in halves
-		{
-			fHalf[ii] = keys[ii];
-			sHalf[ii] = keys[N/2+ii+1];
-		}
-		mergeSort(fHalf, N/2);
-		mergeSort(sHalf, N/2);
-		for (int ii = 0; ii < N; ii++) //merge halves
-		{
-			if (lastOdd > fHalf[i] && lastOdd > sHalf[i] && lastOdd != 0)
-			{
-				keys[ii] = lastOdd;
-				lastOdd = 0;
-			}
-			if (i != N/2 && j != N/2)
-			{
-				if (fHalf[i] >= sHalf[j])
-				{
-					keys[ii] = fHalf[i];
-					i++;
-				}
-				else
-				{
-					keys[ii] = sHalf[j];
-					j++;
-				}
-			}
-			else if (i == N/2)
-			{
-				for (int kk = ii; kk < N; kk++) //fill in halves
-				{
-					keys[ii] = sHalf[j];
-					j++;
-				}
-				break;
-			}
-			else if (j == N/2)
-			{
-				for (int kk = ii; kk < N; kk++) //fill in halves
-				{
-					keys[ii] = fHalf[i];
-					i++;
-				}
-				break;
-			}
-		}
-	}
-	for (int ii = 0; ii < N; ii++) //fill in halves
-	{
-		cout << "(" << keys[ii] << ", " << ii << ") ";
-	}
-}
 
 class Node								//Good To Go
 {
@@ -108,15 +24,10 @@ class Node								//Good To Go
 
 Node::Node(int key)					//Good To Go
 {
-	cout << "Node Created => ";
 	this->key = key;
-	cout << "Key Set => ";
 	next = NULL;
-	cout << "Next Set => ";
 	N = 0;
-	cout << "Size Set => ";
 	factor();
-	cout << "Key Factored => ";
 }
 
 void Node::factor()
@@ -125,7 +36,6 @@ void Node::factor()
 	{
 		if (key%ii==0) N++;
 	}
-	cout << "\nsqrt(key) equals " << (int)sqrt((double)key) << endl;
 	factors = new int[2*N];
 	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
 	{
@@ -133,7 +43,6 @@ void Node::factor()
 		{
 			factors[ii] = key/ii;
 			factors[ii+1] = key/factors[ii];
-			cout << "(" << factors[ii] << ", " << factors[ii + 1] << ")" << endl;
 		}
 	}
 }
@@ -161,24 +70,19 @@ HashTable::HashTable(int N)				//Good To Go
 	{
 		map[ii] = NULL;
 	}
-	cout << "Hash Table Created" << endl;
 }
 
 void HashTable::printTable()
 {
 	Node* current;
-	cout << "{";
 	for (int ii = 0; ii < N; ii++)
 	{
 		current = map[ii];
 		while (current != NULL)
 		{
-			cout << current->getKey() << (current->next == NULL?"":", ");
 			current = current->next;
 		}
-		cout << (ii == N-1?"}":"; ");
 	}
-	cout << endl;
 }
 
 int HashTable::hash(int key)			//Good To Go
@@ -199,10 +103,8 @@ void HashTable::insert(int key)		//Good To Go
 		Node* temp = new Node(key);
 		temp->next = map[index];
 		map[index] = temp;
-		delete temp;
+		//delete temp;
 	}
-	cout << "Key Inserted" << endl;
-	printTable();
 }
 
 Node* HashTable::find(int key)
@@ -212,7 +114,6 @@ Node* HashTable::find(int key)
 	{
 		if (temp->getKey() == key)
 		{
-			cout << "Key Found" << endl;
 			return temp;
 		}
 		else
@@ -258,7 +159,6 @@ bool HashTable::checkFactors(int key, int* inputs, int K)
 			if (A && B) return 1;
 		}
 	}
-	cout << "No Solution" << endl;
 	return 0;
 }
 
@@ -268,37 +168,52 @@ HashTable::~HashTable()					//Good To Go*
 	{
 		delete map[ii];
 	}
-	cout << "Hash Table Deleted" << endl;
 }
 
 int main()								//Needs Work and to check input
 {
-	int N = 0, k = 0;
-	cout << "Insert N>>  ";
-	cin >> N;  // make hash map 2*k in size
+	
+	int N = 0, input = 0;
+	cin >> N;  // make hash map 2*input in size
 	HashTable factors(N);
 	int keys[N];
-	for (int ii = 0; ii < N; ii++)
+	// sort and insert //
+	for (int ii=0; ii<N; ii++) //cycle through to take in all inputs
 	{
-		cout << "Insert key>>  ";
-		cin >> k;
-		cout << "Inserting Key => ";
-		factors.insert(k); //factor a number into its product pairs and insert them in hash table
-		keys[ii] = k;
+		//cin >> input; //take input
+		if (!(cin>>input) || (cin>>input && input < 0))
+		{
+			cout << -1 << endl;
+			return 0;
+		}
+		factors.insert(input); //factor a number into its product pairs and insert them in hash table
+		if (ii == 0)
+		{
+			keys[ii] = input;
+		}
+		else
+		{
+			int i = ii;
+			//insert sort//
+			while (input > keys[i-1] && i > 0)
+			{
+				keys[i] = keys[i-1];
+				i--;
+			}
+			keys[i] = input;
+			//insert sort//
+		}
 	}
-	cout << "Sorting Keys" << endl;
-	mergeSort(keys, N); //sort keys in descending order
-	cout << "looking for max(c=a*b)" << endl;
+	// sort and insert //	
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		if (factors.checkFactors(keys[ii], keys, ii))
+		if (factors.checkFactors(keys[ii], keys, ii+1))
 		{
-			cout << "Max Found" << endl;
-			cout << keys[ii] << endl;  //return the first key to pass test
+			cout << keys[ii] << endl;  //return the first inputey to pass test
 			return 0;
 		}
 	}
-	cout << "Max Not Found" << endl;
-	return -1;
+	cout << -1 << endl;
+	return 0;
 }
 

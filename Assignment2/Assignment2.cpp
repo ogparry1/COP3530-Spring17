@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 class Node								//Good To Go
 {
 	public:
@@ -102,7 +103,7 @@ void HashTable::insert(int key)		//Good To Go
 		Node* temp = new Node(key);
 		temp->next = map[index];
 		map[index] = temp;
-		delete temp;
+		//delete temp;
 	}
 }
 
@@ -179,7 +180,12 @@ int main()								//Needs Work and to check input
 	// sort and insert //
 	for (int ii=0; ii<N; ii++) //cycle through to take in all inputs
 	{
-		cin >> input; //take input
+		//cin >> input; //take input
+		if (!(cin>>input) || (cin>>input && input < 0))
+		{
+			cout << -1 << endl;
+			return 0;
+		}
 		factors.insert(input); //factor a number into its product pairs and insert them in hash table
 		if (ii == 0)
 		{
