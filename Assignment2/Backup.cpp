@@ -175,7 +175,11 @@ int main()								//Needs Work and to check input
 {
 	// Initial Variables //
 	int N = 0, input = 0;
-	cin >> N;  // make hash map 2*input in size
+	if (!(cin>>N) || N < 0)
+	{
+		cout << -1 << endl;
+		return 0;
+	}
 	HashTable factors(N);
 	int keys[N];
 	// Initial Variables //
