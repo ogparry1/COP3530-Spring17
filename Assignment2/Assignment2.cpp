@@ -32,17 +32,20 @@ Node::Node(int key)					//Good To Go
 
 void Node::factor()
 {
-	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
+	int i = 0;
+	for (int ii = 1; ii <= (int)sqrt((double)key); ii++)
 	{
 		if (key%ii==0) N++;
 	}
 	factors = new int[2*N];
-	for (int ii = 2; ii <= (int)sqrt((double)key); ii++)
+	for (int ii = 1; ii <= (int)sqrt((double)key); ii++)
 	{
 		if (key%ii==0) 
 		{
-			factors[ii] = key/ii;
-			factors[ii+1] = key/factors[ii];
+			factors[i] = key/ii;
+			i++;
+			factors[i] = key/factors[i-1];
+			i++;
 		}
 	}
 }
@@ -103,7 +106,6 @@ void HashTable::insert(int key)		//Good To Go
 		Node* temp = new Node(key);
 		temp->next = map[index];
 		map[index] = temp;
-		//delete temp;
 	}
 }
 
@@ -172,21 +174,29 @@ HashTable::~HashTable()					//Good To Go*
 
 int main()								//Needs Work and to check input
 {
-	
+	// Initial Variables //
 	int N = 0, input = 0;
 	cin >> N;  // make hash map 2*input in size
 	HashTable factors(N);
 	int keys[N];
-	// sort and insert //
+	// Initial Variables //
+	
+	// Receives input, inserts and sorts it //
 	for (int ii=0; ii<N; ii++) //cycle through to take in all inputs
 	{
-		//cin >> input; //take input
-		if (!(cin>>input) || (cin>>input && input < 0))
+		// Checks Input //
+		if (!(cin>>input) || input < 0)
 		{
 			cout << -1 << endl;
 			return 0;
 		}
+		// Checks Input //
+		
+		// Inserts Input into HashMap //
 		factors.insert(input); //factor a number into its product pairs and insert them in hash table
+		// Inserts Input into HashMap //
+		
+		//insert sort//
 		if (ii == 0)
 		{
 			keys[ii] = input;
@@ -194,17 +204,18 @@ int main()								//Needs Work and to check input
 		else
 		{
 			int i = ii;
-			//insert sort//
 			while (input > keys[i-1] && i > 0)
 			{
 				keys[i] = keys[i-1];
 				i--;
 			}
 			keys[i] = input;
-			//insert sort//
 		}
+		//insert sort//
 	}
-	// sort and insert //	
+	// Receives input, inserts and sorts it //	
+	
+	// Checks factor pairs and compares to inputs //
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
 		if (factors.checkFactors(keys[ii], keys, ii+1))
@@ -213,6 +224,7 @@ int main()								//Needs Work and to check input
 			return 0;
 		}
 	}
+	// Checks factor pairs and compares to inputs //
 	cout << -1 << endl;
 	return 0;
 }
