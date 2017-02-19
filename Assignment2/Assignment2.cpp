@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 class Node								//Good To Go
 {
 	public:
@@ -218,7 +217,7 @@ int main()								//Needs Work and to check input
 	// Checks factor pairs and compares to inputs //
 	for (int ii = 0; ii < N; ii++) //retreive hashed factor pairs and try them against the lesser inputs than their product
 	{
-		if (factors.checkFactors(keys[ii], keys, ii+1))
+		if (factors.checkFactors(keys[ii], keys, ii))
 		{
 			cout << keys[ii] << endl;  //return the first inputey to pass test
 			return 0;
