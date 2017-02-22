@@ -175,7 +175,7 @@ int main()								//Needs Work and to check input
 {
 	// Initial Variables //
 	int N = 0, input = 0;
-	if (!(cin>>N) || N < 0)
+	if (!(cin>>N) || N <= 0)
 	{
 		cout << -1 << endl;
 		return 0;
@@ -188,7 +188,7 @@ int main()								//Needs Work and to check input
 	for (int ii=0; ii<N; ii++) //cycle through to take in all inputs
 	{
 		// Checks Input //
-		if (!(cin>>input) || input < 0)
+		if (!(cin>>input) || input <= 0)
 		{
 			cout << -1 << endl;
 			return 0;
