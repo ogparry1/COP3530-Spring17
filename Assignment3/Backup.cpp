@@ -13,6 +13,7 @@ class BinNode
 		BinNode* RightChild;
 		int getValue() { return value; };
 		int getIndex() { return index; };
+		void setValue(int value) { this->value = value; };
 		void preorder();
 		void inorder();
 		void postorder();
@@ -56,20 +57,23 @@ class BinTree
 		BinTree(int);
 	private:
 		BinNode* root;
-		BinNode* init;
+		BinNode** init;
 };
 
 BinTree::BinTree(int N)
 {
-	BinNode temp[N](0);
-	init = temp;
+	int value = 0, lc = 0, rc = 0;
+	init = new BinNode*[N];
 	for (int ii = 0; ii < N; ii++)
 	{
-		
+		init[ii] = new BinNode(ii);
 	}
 	for (int ii = 0; ii < N; ii++)
 	{
-		
+		cin >> value >> lc >> rc;
+		init[ii]->setValue(value);
+		init[ii]->LeftChild = init[lc];
+		init[ii]->RightChild = init[rc];
 	}
 }
 
