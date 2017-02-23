@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <array>
 #include <cmath>
+#include <string>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ class BinNode
 		void preorder();
 		void inorder();
 		void postorder();
+		BinNode* next;
 	private:
 		int value;
 		int index;
@@ -28,35 +30,92 @@ BinNode::BinNode(int index)
 	RightChild = NULL;
 	value = 0;
 	this->index = index;
+	next = NULL;
 }
 
 void BinNode::preorder()
 {
-	cout << value << " " << endl;
+	cout << value << " ";
 	if (LeftChild != NULL) { LeftChild->preorder(); };
 	if (RightChild != NULL) { RightChild->preorder(); };
 }
 
 void BinNode::inorder()
 {
-	if (LeftChild != NULL) { LeftChild->preorder(); };
-	cout << value << " " << endl;
-	if (RightChild != NULL) { RightChild->preorder(); };
+	if (LeftChild != NULL) { LeftChild->inorder(); };
+	cout << value << " ";
+	if (RightChild != NULL) { RightChild->inorder(); };
 }
 
 void BinNode::postorder()
 {
-	if (LeftChild != NULL) { LeftChild->preorder(); };
-	if (RightChild != NULL) { RightChild->preorder(); };
-	cout << value << " " << endl;
+	if (LeftChild != NULL) { LeftChild->postorder(); };
+	if (RightChild != NULL) { RightChild->postorder(); };
+	cout << value << " ";
+}
+
+class Queue
+{
+	public:
+		Queue();
+		void push(BinNode*);
+		BinNode* pop();
+		bool isEmpty() { return (front == dummy); };
+	private:
+		BinNode* front;
+		BinNode* rear;
+		BinNode* dummy;
+};
+
+Queue::Queue()
+{
+	dummy = new BinNode(0);
+	front = dummy;
+	rear = dummy;
+	dummy->next = dummy;
+}
+
+void Queue::push(BinNode* node)
+{
+	if (isEmpty())
+	{
+		dummy->next = node;
+		front = node;
+		rear = node;
+		node->next = dummy;
+	}
+	else
+	{
+		rear->next = node;
+		node->next = dummy;
+		rear = node;
+	}
+}
+
+BinNode* Queue::pop()
+{
+	if (isEmpty())
+	{
+		return NULL;
+	}
+	else
+	{
+		BinNode* tmp = front;
+		if (front == rear) { rear = dummy; };
+		front = front->next;
+		dummy->next = front;
+		tmp->next = NULL;
+		return tmp;
+	}
 }
 
 class BinTree
 {
 	public:
 		BinTree(int);
-	private:
 		BinNode* root;
+		
+	private:
 		BinNode** init;
 };
 
@@ -72,9 +131,10 @@ BinTree::BinTree(int N)
 	{
 		cin >> value >> lc >> rc;
 		init[ii]->setValue(value);
-		init[ii]->LeftChild = init[lc];
-		init[ii]->RightChild = init[rc];
+		init[ii]->LeftChild = (lc != -1?init[lc]:NULL);
+		init[ii]->RightChild = (rc != -1?init[rc]:NULL);
 	}
+	root = init[0];
 }
 
 int main()
@@ -82,10 +142,35 @@ int main()
 	int N = 0;
 	cin >> N;  //input number of Nodes
 	BinTree tree(N);
-	for (int ii = 0; ii < N; ii++) 
-	{
-		//input all Node values and their child 
-	}
+	/* Problem 1 P/I/P order traversal
+	 tree.root->preorder();
+	 cout << endl;
+	 tree.root->inorder();
+	 cout << endl;
+	 tree.root->postorder();
+	 * */
+	 
+	 /* Problem 2 Level order traversal
+	 * */
+	 Queue queue;
+	 BinNode* temp = tree.root;
+	 while (temp != NULL)
+	 {
+		 if (temp->LeftChild != NULL)
+		 {
+			queue.push(temp->LeftChild);
+		 }
+		 if (temp->RightChild != NULL)
+		 {
+			queue.push(temp->RightChild);
+		 }
+		 cout << temp->getValue() << " ";
+		 temp = queue.pop();
+	 }
+	 
+	 
+	 /* Problem 3
+	 * */
 	return 0;
 }
 
