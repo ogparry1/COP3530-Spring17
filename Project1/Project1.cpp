@@ -21,12 +21,42 @@ int delimiter(string* exp)
 
 string delStr(string* str, int times)
 {
-	if (times == 1) return str->substr(0, delimiter(str));
-	else 
+	string output = str->substr(0, delimiter(str));
+	string* temp = str;
+	*str = str->substr(delimiter(str)+1, str->length()-1);
+	delete temp;
+	if (times == 1) return output;
+	else return delStr(&output, times-1);
+}
+
+class StackObj
+{
+	public:
+		StackObj(string);
+		string getValue(string) { return value; };
+		double getValue(double) { return atof(value.c_str()); };
+		int rank; 
+	private:
+		string value;
+};
+
+StackObj::StackObj(string value)
+{
+	this->value = value;
+	if (value.length() == 1)
 	{
-		string temp = str->substr(delimiter(str)+1, str->length()-1);
-		return delStr(&temp, times-1);
+		char val = value[0];
+		if (val >= 48 && val <= 58) rank = 1;      //1:double
+		else if (val == 43 || val == 45) rank = 2; //2:add or subtract
+		else if (val == 42 || val == 47) rank = 3; //3:multiply or divide
+		else if (val == 40 || val == 41) rank = 4; //4:parenthases
+		else cout << "Unrecognized-Character :: line 48" << endl;
 	}
+}
+
+void StackMath(stack<StackObj> mathStack) //needs a stack parameter
+{
+	
 }
 
 int main()
@@ -37,27 +67,30 @@ int main()
 	umap.insert(make_pair("e", 2.718));
 	while (true) //loops inputs
 	{
-	string expression = "";
-	getline(cin, expression);  //input
-	if (expression == "quit") break;
-	string F1 = delStr(&expression, 1); //delimit F1
-	cout << F1 << endl;
-	if (F1 == "let") //check "let"
-	{
-		//string F2 = 
-		//make var and continue
-	}
-	else
-	{
-		/*while (Fi != "")
+		string expression = "";
+		getline(cin, expression);  //input
+		if (expression == "quit") break;
+		string F1 = delStr(&expression, 1); //delimit F1
+		cout << F1 << endl;
+		if (F1 == "let") //check "let"
 		{
-			//if Fi is a var, replace it with value
-			//if value is not available, throw error
-			//place in stack
-			//repeat until expression is empty
-		}*/
-	}
-	//do math
+			string F2 = delStr(&expression, 1);
+			string F4 = delStr(&expression, 2);
+			umap.insert(make_pair(F2, atof(F4.c_str())));
+		}
+		else
+		{
+			stack<StackObj> mathStack;
+			/*while (Fi != "")
+			{
+				//if Fi is a var, replace it with value
+				//if value is not available, throw error
+				//place in stack
+				//repeat until expression is empty
+			}*/
+			StackMath(mathStack);
+		}
+		
 	}
 	return 0;
 }
