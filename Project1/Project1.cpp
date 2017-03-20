@@ -2,95 +2,264 @@
 #include <cstdlib>
 #include <string>
 #include <unordered_map>
-#include <stack>
+#include <climits>
+#include <cmath>
 
 using namespace std;
 
-int min(int x, int y)
-{
-	return (x < y?x:y);
-}
-
 int delimiter(string* exp)
 {
-	int x = exp->find("(");
-	int y = exp->find(")");
-	int z = exp->find(" ");
-	return min(x, min(y, z));
+	for (int ii = 0; ii < (int)(*exp).length(); ii++)
+	{
+		if ((*exp)[ii] == ' ' || (*exp)[ii] == '	' ) return ii;
+	}
+	return exp->length();
 }
 
-string delStr(string* str, int times)
+string nextToken(string* str)
 {
-	string output = str->substr(0, delimiter(str));
-	string* temp = str;
-	*str = str->substr(delimiter(str)+1, str->length()-1);
-	delete temp;
-	if (times == 1) return output;
-	else return delStr(&output, times-1);
+	string result = "";
+	cout << *str << endl;
+	int index = delimiter(str);
+	cout << "index = " << index << " and length = " << str->length() << endl;
+	if (index == 0)
+	{
+		*str = str->substr(1, 10000);
+		return nextToken(str);
+	}
+	else
+	{
+		if ((*str)[0] == '(')
+		{
+			result = "(";
+			*str = str->substr(1, 10000);
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[0] == '+')
+		{
+			result = "+";
+			*str = str->substr(2, 10000);
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[0] == '-')
+		{
+			result = "-";
+			*str = str->substr(2, 10000);
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[0] == '*')
+		{
+			result = "*";
+			*str = str->substr(2, 10000);
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[0] == '/')
+		{
+			result = "/";
+			*str = str->substr(2, 10000);
+			cout << result << " added" << endl;
+		}
+		else if (str->substr(0, 4) == "sin(" || str->substr(0, 4) == "cos(" || str->substr(0, 4) == "log(")
+		{
+			result = str->substr(0, 4);
+			*str = str->substr(4, 10000);
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[index-1] == ')')
+		{
+			if (index == (int)str->length())
+			{
+				result = *str;
+				*str = "";
+			}
+			else
+			{
+				result = str->substr(0, index-1);
+				*str = str->substr(index-1, 10000);
+			}
+			cout << result << " added" << endl;
+		}
+		else if ((*str)[0] == ')')
+		{
+			result = ")";
+			*str = str->substr(2, 10000);
+			cout << result << " added" << endl;
+		}
+		else
+		{
+			if (index == (int)str->length())
+			{
+				result = *str;
+				*str = "";
+			}
+			else
+			{
+				result = str->substr(0, index);
+				*str = str->substr(index, 10000);
+			}
+		}
+	}
+	return result;
 }
 
-class StackObj
+template <class T>
+class Deque
 {
 	public:
-		StackObj(string);
-		string getValue(string) { return value; };
-		double getValue(double) { return atof(value.c_str()); };
-		int rank; 
+		Deque();
+		void push(T);
+		T fpop();
+		T rpop();
+		void resize();
+		bool isEmpty() { return (size == 0); };
+		int getSize() { return size; };
 	private:
-		string value;
+		T* deque;
+		int front, rear;
+		int size;
 };
 
-StackObj::StackObj(string value)
+template <class T>
+Deque<T>::Deque()
 {
-	this->value = value;
-	if (value.length() == 1)
-	{
-		char val = value[0];
-		if (val >= 48 && val <= 58) rank = 1;      //1:double
-		else if (val == 43 || val == 45) rank = 2; //2:add or subtract
-		else if (val == 42 || val == 47) rank = 3; //3:multiply or divide
-		else if (val == 40 || val == 41) rank = 4; //4:parenthases
-		else cout << "Unrecognized-Character :: line 48" << endl;
-	}
+	deque = new T[20]();
+	front = 0;
+	rear = 0;
+	size = 0;
 }
 
-void StackMath(stack<StackObj> mathStack) //needs a stack parameter
+template <class T>
+void Deque<T>::push(T num)
 {
-	
+	if (front == rear && !isEmpty()) resize();
+	deque[front] = num;
+	front++;
+}
+
+template <class T>
+T Deque<T>::fpop()
+{
+	front--;
+	return deque[front];
+}
+
+template <class T>
+T Deque<T>::rpop()
+{
+	return deque[rear++];
+}
+
+template <class T>
+void Deque<T>::resize()
+{
+	T* temp = new T[2*size]();
+	for (int ii = 0; ii < size; ii++)
+	{
+		temp[rear+ii] = deque[(rear+ii)%size];
+		front = rear+ii;
+	}
+	deque = temp;
+}
+
+class Mathing
+{
+	public:
+		Mathing();
+		double doMath(string*);
+		void printMath(string* Fx) { cout << doMath(Fx) << endl; };
+	private:
+		Deque<double> doubles;
+		Deque<char> operands;
+		double result;
+};
+
+Mathing::Mathing()
+{
+	result = 0;
+	doubles = Deque<double>();
+	operands = Deque<char>();
+}
+
+double Mathing::doMath(string* Fx)
+{
+	string token = "";
+	while(*Fx != "")
+	{
+		token = nextToken(Fx);
+		//cout << token << endl;
+		if (token[0] >= '0' || token[0] <= '9') doubles.push(atof(token.c_str()));
+		else if (token == "*" || token == "/")
+		{
+			string tempNext = nextToken(Fx);
+			if (tempNext == "sin" || tempNext == "cos" || tempNext == "log" || tempNext == "(")
+			{
+				*Fx = tempNext + *Fx;
+				double tempValue = doMath(Fx);
+				if (token == "/" && tempValue == 0)
+				{
+					cout << "Division-By-Zero" << endl;
+				}
+				else 
+				{
+					((token == "*") ? doubles.push(doubles.fpop()*tempValue) : doubles.push(doubles.fpop()/tempValue));
+				}
+			}
+		}
+		else if (token == "+" || token == "-") operands.push((token == "+"?'+':'-'));
+		else if (token == "sin(") doubles.push(sin(doMath(Fx)));
+		else if (token == "cos(") doubles.push(cos(doMath(Fx)));
+		else if (token == "log(") doubles.push(log(doMath(Fx)));
+		else if (token == "(") doubles.push(doMath(Fx));
+		else if (token == ")") break;
+	}
+	//if (doubles.isEmpty()) exit(189);
+	result = doubles.rpop();
+	while(!doubles.isEmpty())
+	{
+		//rpop all pieces doing their respective +/-
+		char operation = operands.rpop();
+		if (operation == '+') result += doubles.rpop();
+		else result -= doubles.rpop();
+	}
+	if (!operands.isEmpty()) exit(198);
+	return result;
 }
 
 int main()
 {
+	/*string Fx = "";
+	getline(cin, Fx);
+	cout << delimiter(&Fx) << endl;
+	return 0;*/
+	
 	unordered_map<string, double> umap;
 	unordered_map<string, double>::iterator it;
 	umap.insert(make_pair("Pi", 3.14169));
 	umap.insert(make_pair("e", 2.718));
+	string constants[] = 
+	{"quit", "let", "Pi", "e", "sin", "cos", "log"};					//all unchangable keys
 	while (true) //loops inputs
 	{
-		string expression = "";
-		getline(cin, expression);  //input
-		if (expression == "quit") break;
-		string F1 = delStr(&expression, 1); //delimit F1
-		cout << F1 << endl;
-		if (F1 == "let") //check "let"
+		string Fx = "";
+		getline(cin, Fx);  												//input
+		if (Fx == "quit") break;										//check exit condition
+		if (Fx.substr(0, 3) == "let") 									//check "let"
 		{
-			string F2 = delStr(&expression, 1);
-			string F4 = delStr(&expression, 2);
-			umap.insert(make_pair(F2, atof(F4.c_str())));
+			nextToken(&Fx);												//deletes "let "
+			string key = nextToken(&Fx);								//sets key to inputVariable
+			for (int ii = 0; ii < 7; ii++) 
+			{
+				if (key == constants[ii]) continue;						//checks key against all constants
+			}
+			Mathing math = Mathing();
+			double value = math.doMath(&Fx);
+			umap.insert(make_pair(key, value));							//hashes (key, value)
 		}
 		else
 		{
-			stack<StackObj> mathStack;
-			/*while (Fi != "")
-			{
-				//if Fi is a var, replace it with value
-				//if value is not available, throw error
-				//place in stack
-				//repeat until expression is empty
-			}*/
-			StackMath(mathStack);
+			Mathing math = Mathing();
+			math.printMath(&Fx);
 		}
-		
 	}
 	return 0;
 }

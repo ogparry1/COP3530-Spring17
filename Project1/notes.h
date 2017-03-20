@@ -1,3 +1,38 @@
+string nextToken(string* str)
+{
+	int delData = delimiter(*str);  										//finds index of delimit and type of delimit
+	//possible error spot//
+	if (delData == INT_MAX || *str == ")") 								//checks for last word
+	{
+		string output = *str;
+		*str = "";
+		return output;
+	}
+	//possible error spot//
+	if (delData == 2 || delData == 3)
+	{
+		*str = str->substr(1, str->length());
+		return (delData == 2?"(":")");
+	}
+	int type = delData%10; 												//1's place tells if " = ", " ", "(", or ")"
+	int index = (delData-type)/10; 										//10's place divided by ten gives the index of the term
+	string output = str->substr(0, index); 								//create substring of str from str[0..index]
+	if (type == 0 || type == 1) 										//cut out space or equals
+	*str = str->substr(index+(type == 0?3:1), str->length()); 
+	else if (type == 2 || type == 3) 									//cut up to "(" or ")" but preserve delimiter
+	*str = str->substr(index, str->length());
+	else exit(49);
+	return output;
+}
+
+
+
+
+
+
+
+
+
 class Node								//Good To Go
 {
 	public:
