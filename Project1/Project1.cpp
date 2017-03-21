@@ -41,6 +41,7 @@ string nextToken(string* str)
 	if (index == 0)
 	{
 		*str = str->substr(1, 10000);
+		if (*str == "") return "";
 		return nextToken(str);
 	}
 	else
@@ -253,6 +254,7 @@ double Mathing::doMath(string* Fx, unordered_map<string, double>* umap)
 	while(*Fx != "")
 	{
 		token = nextToken(Fx);
+		if (token == "") break;
 		if (!convert(&token, umap)) return INT_MIN;
 		if (token == "*" || token == "/" || token == "^")
 		{
@@ -262,6 +264,7 @@ double Mathing::doMath(string* Fx, unordered_map<string, double>* umap)
 			{
 				return INT_MAX;
 			}
+			else if ((int)tempValue == INT_MIN) return tempValue;
 			else 
 			{
 				if (token == "*") tempValue = doubles.fpop()*tempValue;
@@ -297,14 +300,14 @@ double Mathing::doMath(string* Fx, unordered_map<string, double>* umap)
 	result = doubles.rpop();
 	char operation;
 	double next;
-	for (int ii = 0; ii < 3; ii++);
-	//while(!doubles.isEmpty())
+	//for (int ii = 0; ii < 3; ii++);
+	while(!doubles.isEmpty())
 	{
 		operation = operands.rpop();
 		next = doubles.rpop();
 		//cout << result << operation << next << " = " << result + next << endl;
 		if (operation == '+') result += next;
-		else result -= next;
+		else if (operation == '-') result -= next;
 	}
 	return result;
 }
@@ -340,8 +343,8 @@ int main()
 				if (key == constants[ii]) continue;						//checks key against all constants
 			}
 			double value = math.doMath(&Fx, &umap);
-			if (value == INT_MIN) cout << "Undeclared-Variable" << endl;
-			else if (value == INT_MAX) cout << "Division-By-Zero" << endl;
+			if ((int)value == INT_MIN) cout << "Undeclared-Variable" << endl;
+			else if ((int)value == INT_MAX) cout << "Division-By-Zero" << endl;
 			else if (umap.find(key) != umap.end())
 			{
 				umap.erase(key);
