@@ -22,8 +22,10 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=651;C++;0;EUTF-8;1;1;0;%2Fhome%2Fogparry1%2FDocuments%2FSchool%2FClasses%2FCOP3530%2FAssignments%2FProject1%2FProject1.cpp;0;4
+current_page=2
+FILE_NAME_0=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fogparry1%2FDocuments%2FSchool%2FClasses%2FCOP3530%2FAssignments%2FProject1%2FProject1.cpp;0;4
+FILE_NAME_1=977;C;0;EUTF-8;1;1;0;%2Fhome%2Fogparry1%2FDocuments%2FSchool%2FClasses%2FCOP3530%2FAssignments%2FProject1%2Fnotes.h;0;4
+FILE_NAME_2=7222;C++;0;EUTF-8;1;1;0;%2Fhome%2Fogparry1%2FDocuments%2FSchool%2FClasses%2FCOP3530%2FAssignments%2FProject1%2FSecondIdeas.cpp;0;4
 
 [VTE]
 last_dir=/home/ogparry1
