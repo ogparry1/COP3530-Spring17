@@ -19,7 +19,8 @@ indent_mode=2
 
 [project]
 name=Project2
-base_path=/home/ogparry1/projects//home/ogparry1/Documents/School/Classes/COP3530/Assignments/Project2/
+base_path=/home/ogparry1/Documents/School/Classes/COP3530/Assignments/Project2/
+description=
 
 [long line marker]
 long_line_behaviour=1
