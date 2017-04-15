@@ -3,6 +3,11 @@
 
 using namespace std;
 
+void showPattern()
+{
+	
+}
+
 int main()
 {
 	string key = "", hint = "";	// key and hint
