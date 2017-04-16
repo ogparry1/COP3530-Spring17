@@ -52,11 +52,6 @@ Password::Password(string key, string hint)
 	klen = key.length(); hlen = hint.length();
 	pattern = new int[hlen];
 	showPattern(hint.c_str(), hlen, pattern);  // O(W)
-	for (int ii = 0; ii < hlen; ii++)
-	{
-		cout << pattern[ii] << " ";
-	}
-	cout << endl;
 	diff = new int[klen], ffid = new int[klen];
 	dii = 0; fii = 0; codelen = 0;
 	makediff();
@@ -69,6 +64,7 @@ void Password::resize() //resizes the arrays of diff and ffid to fit their data
 	{
 		tmp1[ii] = diff[ii];
 		tmp2[ii] = ffid[dii-ii];
+		cout << tmp1[ii] << " " << tmp2[ii] << endl;
 	}
 	diff = tmp1; ffid = tmp2;
 	dii--; fii = dii;
