@@ -7,6 +7,7 @@ using namespace std;
 
 int* showPattern(const char* hint, int length)  //shows the pattern of hint
 {
+	cout << "Showpattern" << endl;
 	int* pattern = new int[length];
 	int ii = 1, last = 0;
 	while (ii < length)
@@ -47,6 +48,7 @@ class Password  // class that holds the all provided info
 
 Password::Password(string key, string hint)
 {
+	cout << "Class initialize" << endl;
 	this->key = key; this->hint = hint;
 	code = "";
 	klen = key.length(); hlen = hint.length();
@@ -58,6 +60,7 @@ Password::Password(string key, string hint)
 
 void Password::resize() //resizes the arrays of diff and ffid to fit their data
 {
+	cout << "Password resize" << endl;
 	int tmp1[dii], tmp2[dii];
 	for (int ii = 0; ii < dii; ii++) 
 	{
@@ -69,6 +72,7 @@ void Password::resize() //resizes the arrays of diff and ffid to fit their data
 
 void Password::makediff()
 {
+	cout << "makediff()" << endl;
 	int ki = 0, hi = 0, temp = -1;
 	while (ki < klen)
 	{
@@ -94,10 +98,10 @@ void Password::makediff()
 
 Password diffid(Password pass) // compares diff and ffid
 {
+	cout << "diffid()" << endl;
 	if (pass.diff[pass.dii] == pass.ffid[pass.fii])
 	{
 		pass.code = to_string(pass.diff[pass.dii]) + " " + pass.code;
-		cout << pass.code << endl;
 		if (pass.dii != 0 && pass.fii != 0) 
 		{
 			pass.dii--; pass.fii--;
@@ -125,8 +129,11 @@ int main()
 	string key = "", hint = "";
 	getline(cin, key);
 	getline(cin, hint);
+	cout << "INITIALIZING RESULT" << endl;
 	Password result = Password(key, hint);
+	cout << "INITIALIZING DIFFID(RESULT)" << endl;
 	diffid(result);
+	cout << "PRINTING RESULT" << endl;
 	cout << result.code;
 	return 0;
 }
