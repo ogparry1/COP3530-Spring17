@@ -1,59 +1,137 @@
 #include <iostream>
 #include <string>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
 
 using namespace std;
 
-void showPattern()
+void showPattern(const char* hint, int length, int* pattern)  //shows the pattern of hint
 {
-	
+	int last = 0, ii = 1;
+	pattern[0] = 0;
+	while (ii < length)
+	{
+		if (hint[ii] == hint[last])
+		{
+			last++;
+			pattern[ii] = last;
+			ii++;
+		}
+		else
+		{
+			if (last != 0)
+			{
+				last = pattern[last-1];
+			}
+			else
+			{
+				pattern[ii] = 0;
+				ii++;
+			}
+		}
+	}
+}
+
+class Password  // class that holds the all provided info
+{
+	public:
+		Password(string, string);
+		Password(Password, int, int);
+		void resize();
+		void makediff();
+		string key, hint, code;
+		int *diff, *ffid, *pattern;
+		int klen, hlen, codelen, dii, fii;
+};
+
+Password::Password(string key, string hint)
+{
+	this->key = key; this->hint = hint;
+	code = "";
+	klen = key.length(); hlen = hint.length();
+	pattern = new int[hlen];
+	showPattern(hint.c_str(), hlen, pattern);  // O(W)
+	diff = new int[klen], ffid = new int[klen];
+	dii = 0; fii = 0; codelen = 0;
+	makediff();
+}
+
+void Password::resize() //resizes the arrays of diff and ffid to fit their data
+{
+	int tmp1[dii], tmp2[dii];
+	for (int ii = 0; ii < dii; ii++) 
+	{
+		tmp1[ii] = diff[ii];
+		tmp2[ii] = diff[dii-ii-1];
+	}
+	diff = tmp1; ffid = tmp2;
+	dii--; fii = dii;
+}
+
+void Password::makediff()
+{
+	int ki = 0, hi = 0, temp = -1;
+	while (ki < klen)
+	{
+		if (key[ki] == hint[hi])
+		{
+			ki++;
+			hi++;
+		}
+		if (hi == hlen)
+		{
+			if (temp != -1) 
+			{
+				diff[dii] = (ki-hi) - temp;
+				dii++;
+			}
+			temp = ki - hi;
+			hi = pattern[hi-1];
+		}
+		else if (ki < klen && key[ki] != hint[hi])
+		{
+			if (hi != 0) hi = pattern[hi-1];
+			else ki++;
+		}
+	}
+	resize();
+}
+
+Password diffid(Password pass) // compares diff and ffid
+{
+	if (pass.diff[pass.dii-1] == pass.ffid[pass.fii-1])
+	{
+		pass.code = to_string(pass.diff[pass.dii]) + " " + pass.code;
+		if (pass.dii != 0 && pass.fii != 0) 
+		{
+			pass.dii--; pass.fii--;
+			pass.codelen += 1 + diffid(pass).codelen;
+		}
+		else pass.codelen += 1;
+		return pass;
+	}
+	else
+	{
+		if (pass.dii != 0 && pass.fii != 0)
+		{
+			Password pass1 = Password(pass), pass2 = Password(pass);
+			pass1.dii--; pass2.fii--;
+			pass1 = diffid(pass1); pass2 = diffid(pass2);
+			pass.code = (pass1.codelen > pass2.codelen ? pass1.code : pass2.code) + " " + pass.code;
+			pass.codelen += (pass1.codelen > pass2.codelen ? pass1.codelen : pass2.codelen);
+		}
+		return pass;
+	}
 }
 
 int main()
 {
-	string key = "", hint = "";	// key and hint
-	string ficode = "", frcode = "";	// derived forward and reverse order codes
-	getline(cin, key);	// get key
-	getline(cin, hint);	// get hint
-	int icode[key.length()]; // define arrays for forward and reverse indexes
-	int icodeIndex = -1, next = -1, first = -1, posi = 0, posr = 0; // index in icode, traversal index, indexes to compare
-	cout << "";	// default output of empty line
-	for (int ii = 0; ii <= (int)(key.length() - hint.length()); ii++)
-	{
-		if (key.substr(ii, hint.length()) == hint) // finds hint across forward key
-		{
-			next = ii;
-			if (next >= 0 && first >= 0) 
-			{
-				int diff = next - first;
-				icode[++icodeIndex] = diff;
-			}
-			first = next;
-		}
-	}
-	int rcode[icodeIndex+1];
-	for (int ii = 0; ii <= icodeIndex; ii++) { rcode[ii] = icode[icodeIndex-ii]; }
-	for (int ii = 0; ii <= icodeIndex; ii++)
-	{
-		for (int jj = posi; jj <= icodeIndex; jj++)
-		{
-			if (icode[ii] == rcode[jj])
-			{
-				ficode += to_string(rcode[jj]) + " ";
-				posi = jj+1;
-				break;
-			}
-		}
-		for (int jj = posr; jj <= icodeIndex; jj++)
-		{
-			if (rcode[ii] == icode[jj])
-			{
-				frcode += to_string(icode[jj]) + " ";
-				posr = jj+1;
-				break;
-			}
-		}
-	}
-	cout << (ficode.length() > frcode.length() ? ficode : frcode);
+	string key = "", hint = "";
+	getline(cin, key);
+	getline(cin, hint);
+	Password result = Password(key, hint);
+	diffid(result);
+	cout << result.code;
 	return 0;
 }
-
