@@ -2,29 +2,38 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <cassert>
 
 using namespace std;
 
 int* showPattern(const char* hint, int length)  //shows the pattern of hint
 {
 	int* pattern = new int[length];
-	int ii = 1, last = 0;
+	int last = 0, ii = 1;
+	pattern[0] = 0;
+	cout << "0 ";
+	//assert(length == 2);
 	while (ii < length)
 	{
+		cout << pattern[ii] << " ";
 		if (hint[ii] == hint[last])
 		{
+			//cout << hint[ii] << " == " << hint[last] << endl;
 			last++;
 			pattern[ii] = last;
 			ii++;
 		}
 		else
 		{
+			//cout << hint[ii] << " != " << hint[last] << " ";
 			if (last != 0)
 			{
+				//cout << "and last == " << last << " != 0" << endl;
 				last = pattern[last-1];
 			}
 			else
 			{
+				//cout << "and last == " << last << " == 0" << endl;
 				pattern[ii] = 0;
 				ii++;
 			}
@@ -50,7 +59,9 @@ Password::Password(string key, string hint)
 	this->key = key; this->hint = hint;
 	code = "";
 	klen = key.length(); hlen = hint.length();
+	pattern = new int[hlen];
 	pattern = showPattern(hint.c_str(), hlen);  // O(W)
+	//assert(pattern[0] == 0 && pattern[1] == 1);
 	diff = new int[klen], ffid = new int[klen];
 	dii = 0; fii = 0; codelen = 0;
 	makediff();
