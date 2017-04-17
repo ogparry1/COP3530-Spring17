@@ -105,49 +105,24 @@ int* Password::makediff()
 Password diffid(Password pass) // compares diff and ffid
 {
 	// from main or diffid
-	cout << "Diff:: ";
-	for (int ii = 0; ii < pass.dii; ii++) 
-	{
-		printf("%i ", pass.diff[ii]);
-	}
-	cout << endl << "FFid:: ";
-	for (int ii = 0; ii < pass.fii; ii++) 
-	{
-		printf("%i ", pass.ffid[ii]);
-	}
-	cout << endl;
-	printf("(%i, %i)\n", pass.diff[pass.dii-1], pass.ffid[pass.fii-1]);
 	if (pass.diff[pass.dii-1] == pass.ffid[pass.fii-1])
 	{
-		printf("Code:: adding %s to %s\n\n", to_string(pass.diff[pass.dii-1]).c_str(), pass.code.c_str());
 		pass.code = to_string(pass.diff[pass.dii-1]) + " " + pass.code;
-		if (pass.dii-1 != 0 && pass.fii-1 != 0) 
+		pass.codelen++;
+		if (pass.dii-1 > 0 && pass.fii-1 > 0) 
 		{
 			pass.dii--; pass.fii--;
-			pass.codelen += 1 + diffid(pass).codelen;
+			return diffid(pass);
 		}
-		else 
-		{
-			pass.codelen += 1;
-			cout << endl << "Hit Base with code = " << pass.code << endl;
-		}
-		cout << endl << "Returning " << pass.code << endl;
-		return pass;
 	}
-	else // pass.diff[pass.dii] != pass.ffid[pass.fii]
+	else if (pass.dii-1 > 0 && pass.fii-1 > 0)
 	{
-		if (pass.dii-1 != 0 && pass.fii-1 != 0)
-		{
-			Password pass1 = Password(pass), pass2 = Password(pass);
-			pass1.dii--; pass2.fii--;
-			pass1 = diffid(pass1); pass2 = diffid(pass2);
-			pass.code = (pass1.codelen > pass2.codelen ? pass1.code : pass2.code) + " " + pass.code;
-			pass.codelen += (pass1.codelen > pass2.codelen ? pass1.codelen : pass2.codelen);
-		}
-		cout << endl << "Returning " << pass.code << endl;
-		return pass;
+		Password pass1 = Password(pass), pass2 = Password(pass);
+		pass1.dii--; pass2.fii--;
+		pass1 = diffid(pass1); pass2 = diffid(pass2);
+		return (pass1.codelen > pass2.codelen ? pass1 : pass2);
 	}
-	// to main
+	return pass;
 }
 
 int main()
