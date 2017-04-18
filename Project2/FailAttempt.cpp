@@ -1,59 +1,158 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
+#include <cmath>
 
 using namespace std;
 
-void showPattern()
+void showPattern(const char* hint, int length, int* pattern)  //shows the pattern of hint
 {
-	
+	// from Password constructor
+	int last = 0, ii = 1;
+	pattern[0] = 0;
+	while (ii < length)
+	{
+		if (hint[ii] == hint[last])
+		{
+			last++;
+			pattern[ii] = last;
+			ii++;
+		}
+		else
+		{
+			if (last != 0)
+			{
+				last = pattern[last-1];
+			}
+			else
+			{
+				pattern[ii] = 0;
+				ii++;
+			}
+		}
+	}
+	// to Password constructor
+}
+
+class Password  // class that holds the all provided info
+{
+	public:
+		Password(string, string);
+		int* makediff();
+		string key, hint, code;
+		int* diff; int* pattern;
+		int klen, hlen, codelen, dii;
+};
+
+Password::Password(string key, string hint)
+{
+	// from main or diffid
+	this->key = key; this->hint = hint;
+	dii = 0; codelen = 0; code = "";
+	klen = key.length(); hlen = hint.length();
+	pattern = new int[hlen];
+	showPattern(hint.c_str(), hlen, pattern);  // O(W)
+	//reverse(makediff());
+	diff = makediff();
+}
+
+int* Password::makediff()
+{
+	// from Password constructor
+	int ki = 0, hi = 0, temp = -1;
+	int* differences = new int[klen];
+	while (ki < klen)
+	{
+		if (key[ki] == hint[hi])
+		{
+			ki++;
+			hi++;
+		}
+		if (hi == hlen)
+		{
+			if (temp != -1) 
+			{
+				differences[dii] = (ki-hi) - temp;
+				cout << differences[dii] << " ";
+				dii++;
+			}
+			temp = ki - hi;
+			hi = pattern[hi-1];
+		}
+		else if (ki < klen && key[ki] != hint[hi])
+		{
+			if (hi != 0) hi = pattern[hi-1];
+			else ki++;
+		}
+	}
+	cout << endl;
+	return differences;
+}
+
+int max(int x, int y)
+{
+	if (x > y) return x;
+	else return y;
+}
+
+string diffid(Password pass) // compares diff and ffid
+{
+	pass.dii++;
+	int LCSmatrix[(int)pow(pass.dii, 2)];
+	string result = "";
+	int i = 0, ii = 0, jj = 0;
+	while (i < (int)pow(pass.dii, 2))
+	{
+		ii = floor(i/pass.dii); jj = (i%pass.dii);
+		if (ii == 0 || jj == 0) LCSmatrix[i] = 0;
+		else if (pass.diff[jj-1] == pass.diff[pass.dii-jj-1]) LCSmatrix[i] = LCSmatrix[i-pass.dii-1] + 1;
+		else LCSmatrix[i] = max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]);
+		i++;
+	}
+	i--;
+	while (true)
+	{
+		int ii = floor(i/pass.dii), jj = (i%pass.dii);
+		if (ii == 0 || jj == 0) break;
+		if (max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]) == LCSmatrix[i-pass.dii-1])
+		{
+			result = to_string(pass.diff[jj-1]) + " " + result;
+			cout << result << endl;
+			i = i-pass.dii-1;
+		}
+		else
+		{
+			if (LCSmatrix[i-1] > LCSmatrix[i-pass.dii]) i--;
+			else i = i-pass.dii;
+		}
+	}
+	return result;
 }
 
 int main()
 {
-	string key = "", hint = "";	// key and hint
-	string ficode = "", frcode = "";	// derived forward and reverse order codes
-	getline(cin, key);	// get key
-	getline(cin, hint);	// get hint
-	int icode[key.length()]; // define arrays for forward and reverse indexes
-	int icodeIndex = -1, next = -1, first = -1, posi = 0, posr = 0; // index in icode, traversal index, indexes to compare
-	cout << "";	// default output of empty line
-	for (int ii = 0; ii <= (int)(key.length() - hint.length()); ii++)
+	int start = 1, end = 8;
+	cin >> start >> end;
+	for (int ii = start; ii <= end; ii++)
 	{
-		if (key.substr(ii, hint.length()) == hint) // finds hint across forward key
-		{
-			next = ii;
-			if (next >= 0 && first >= 0) 
-			{
-				int diff = next - first;
-				icode[++icodeIndex] = diff;
-			}
-			first = next;
-		}
+		printf("Iteration:: %i\n", ii);
+		string key = "", hint = "", correctAnswer = "", answer = "";
+		ifstream input, output;
+		string file1 = "/home/ogparry1/Documents/School/Classes/COP3530/Assignments/Project2/input" + to_string(ii) + ".txt";
+		string file2 = "/home/ogparry1/Documents/School/Classes/COP3530/Assignments/Project2/output" + to_string(ii) + ".txt";
+		input.open(file1);
+		output.open(file2);
+		getline(input, key);
+		getline(input, hint);
+		getline(output, correctAnswer);
+		Password result = Password(key, hint);
+		printf("key = %s\nhint = %s\n", key.c_str(), hint.c_str());
+		answer = diffid(result);
+		cout << "Answer:: " << answer << endl;
+		printf("Correct Answer:: %s\n\n", correctAnswer.c_str());
 	}
-	int rcode[icodeIndex+1];
-	for (int ii = 0; ii <= icodeIndex; ii++) { rcode[ii] = icode[icodeIndex-ii]; }
-	for (int ii = 0; ii <= icodeIndex; ii++)
-	{
-		for (int jj = posi; jj <= icodeIndex; jj++)
-		{
-			if (icode[ii] == rcode[jj])
-			{
-				ficode += to_string(rcode[jj]) + " ";
-				posi = jj+1;
-				break;
-			}
-		}
-		for (int jj = posr; jj <= icodeIndex; jj++)
-		{
-			if (rcode[ii] == icode[jj])
-			{
-				frcode += to_string(icode[jj]) + " ";
-				posr = jj+1;
-				break;
-			}
-		}
-	}
-	cout << (ficode.length() > frcode.length() ? ficode : frcode);
 	return 0;
 }
-

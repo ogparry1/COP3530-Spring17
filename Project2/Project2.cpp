@@ -1,8 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstring>
 #include <cstdlib>
 #include <cassert>
+#include <cmath>
 
 using namespace std;
 
@@ -39,36 +41,22 @@ class Password  // class that holds the all provided info
 {
 	public:
 		Password(string, string);
-		Password(Password, int, int);
-		void reverse(int*);
 		int* makediff();
 		string key, hint, code;
-		int* diff; int* ffid; int* pattern;
-		int klen, hlen, codelen, dii, fii;
+		int* diff; int* pattern;
+		int klen, hlen, codelen, dii;
 };
 
 Password::Password(string key, string hint)
 {
 	// from main or diffid
 	this->key = key; this->hint = hint;
-	dii = 0; fii = 0; codelen = 0; code = "";
+	dii = 0; codelen = 0; code = "";
 	klen = key.length(); hlen = hint.length();
 	pattern = new int[hlen];
 	showPattern(hint.c_str(), hlen, pattern);  // O(W)
-	reverse(makediff());
-}
-
-void Password::reverse(int* differences) //resizes the arrays of diff and ffid to fit their data
-{
-	// from makediff
-	fii = dii;
-	diff = new int[dii]; ffid = new int[fii];
-	for (int ii = 0; ii < dii; ii++) 
-	{
-		diff[ii] = differences[ii];
-		ffid[ii] = differences[dii-ii-1];
-	}
-	// to main or diffid
+	//reverse(makediff());
+	diff = makediff();
 }
 
 int* Password::makediff()
@@ -88,6 +76,7 @@ int* Password::makediff()
 			if (temp != -1) 
 			{
 				differences[dii] = (ki-hi) - temp;
+				cout << differences[dii] << " ";
 				dii++;
 			}
 			temp = ki - hi;
@@ -99,38 +88,54 @@ int* Password::makediff()
 			else ki++;
 		}
 	}
+	cout << endl;
 	return differences;
 }
 
-Password diffid(Password pass) // compares diff and ffid
+int max(int x, int y)
 {
-	// from main or diffid
-	if (pass.diff[pass.dii-1] == pass.ffid[pass.fii-1])
+	if (x > y) return x;
+	else return y;
+}
+
+string diffid(Password pass) // compares diff and ffid
+{
+	pass.dii++;
+	int LCSmatrix[(int)pow(pass.dii, 2)];
+	string result = "";
+	int i = 0, ii = 0, jj = 0;
+	while (i < (int)pow(pass.dii, 2))
 	{
-		pass.code = to_string(pass.diff[pass.dii-1]) + " " + pass.code;
-		pass.codelen++;
-		if (pass.dii-1 > 0 && pass.fii-1 > 0) 
+		ii = floor(i/pass.dii); jj = (i%pass.dii);
+		if (ii == 0 || jj == 0) LCSmatrix[i] = 0;
+		else if (pass.diff[jj-1] == pass.diff[pass.dii-jj]) LCSmatrix[i] = LCSmatrix[i-pass.dii-1] + 1;
+		else LCSmatrix[i] = max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]);
+		i++;
+	}
+	i--;
+	while (floor(i/pass.dii) > 0 && (i%pass.dii) > 0)
+	{
+		int jj = (i%pass.dii);
+		if (max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]) == LCSmatrix[i-pass.dii-1])
 		{
-			pass.dii--; pass.fii--;
-			return diffid(pass);
+			i -= (pass.dii+1);
+		}
+		else
+		{
+			result = to_string(pass.diff[jj-1]) + result + " ";
+			if (LCSmatrix[i-1] > LCSmatrix[i-pass.dii]) i--;
+			else i -= pass.dii;
 		}
 	}
-	else if (pass.dii-1 > 0 && pass.fii-1 > 0)
-	{
-		Password pass1 = Password(pass), pass2 = Password(pass);
-		pass1.dii--; pass2.fii--;
-		pass1 = diffid(pass1); pass2 = diffid(pass2);
-		return (pass1.codelen > pass2.codelen ? pass1 : pass2);
-	}
-	return pass;
+	return result;
 }
 
 int main()
 {
-	string key = "", hint = "";
+	string key = "", hint = "", answer = "";
 	getline(cin, key);
 	getline(cin, hint);
 	Password result = Password(key, hint);
-	cout << diffid(result).code;
+	cout << diffid(result);
 	return 0;
 }
