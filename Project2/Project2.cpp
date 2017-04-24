@@ -55,7 +55,6 @@ Password::Password(string key, string hint)
 	klen = key.length(); hlen = hint.length();
 	pattern = new int[hlen];
 	showPattern(hint.c_str(), hlen, pattern);  // O(W)
-	//reverse(makediff());
 	diff = makediff();
 }
 
@@ -76,7 +75,6 @@ int* Password::makediff()
 			if (temp != -1) 
 			{
 				differences[dii] = (ki-hi) - temp;
-				cout << differences[dii] << " ";
 				dii++;
 			}
 			temp = ki - hi;
@@ -88,7 +86,6 @@ int* Password::makediff()
 			else ki++;
 		}
 	}
-	cout << endl;
 	return differences;
 }
 
@@ -108,23 +105,24 @@ string diffid(Password pass) // compares diff and ffid
 	{
 		ii = floor(i/pass.dii); jj = (i%pass.dii);
 		if (ii == 0 || jj == 0) LCSmatrix[i] = 0;
-		else if (pass.diff[jj-1] == pass.diff[pass.dii-jj]) LCSmatrix[i] = LCSmatrix[i-pass.dii-1] + 1;
+		else if (pass.diff[jj-1] == pass.diff[pass.dii-ii-1]) LCSmatrix[i] = LCSmatrix[i-pass.dii-1] + 1;
 		else LCSmatrix[i] = max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]);
 		i++;
 	}
 	i--;
-	while (floor(i/pass.dii) > 0 && (i%pass.dii) > 0)
+	while (true)
 	{
-		int jj = (i%pass.dii);
-		if (max(LCSmatrix[i-1], LCSmatrix[i-pass.dii]) == LCSmatrix[i-pass.dii-1])
+		int ii = floor(i/pass.dii), jj = (i%pass.dii);
+		if (ii == 0 || jj == 0) break;
+		if ((LCSmatrix[i-1] == LCSmatrix[i-pass.dii]) && (LCSmatrix[i-pass.dii] == LCSmatrix[i-pass.dii-1]))
 		{
-			i -= (pass.dii+1);
+			if (LCSmatrix[i] > LCSmatrix[i-pass.dii-1]) result = to_string(pass.diff[jj-1]) + " " + result;
+			i = i-pass.dii-1;
 		}
 		else
 		{
-			result = to_string(pass.diff[jj-1]) + result + " ";
 			if (LCSmatrix[i-1] > LCSmatrix[i-pass.dii]) i--;
-			else i -= pass.dii;
+			else i = i-pass.dii;
 		}
 	}
 	return result;
